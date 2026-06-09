@@ -84,6 +84,8 @@ layer clearance, vial/drain, printability) and tightened a few:
 
 ![tray with the +x/+y corner now closed (45° chamfer)](tray_fixed.png)
 
+![lid seated on a tray, sectioned — skirt telescopes down over the rim](fitcheck_section.png)
+
 ## Print recipe (modular)
 For an **N-layer** tower:
 
