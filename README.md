@@ -1,49 +1,55 @@
-# 100× 3 mL Vial Freezer Container — Near-Cube Honeycomb
+# 100× 3 mL Vial Freezer Storage — Compact Stacking Trays
 
-The smallest practical 3D-printable container for **100 lyophilized 3 mL vials**, optimized to be compact in *all three* dimensions (near-cube, not a flat tray).
+Smallest practical 3D-printable freezer storage for **100 lyophilized 3 mL vials**
+(Ø16.51 × 37.74 mm), packed near-cube. Open/vented, PETG/PP, prints on a cheap 220 mm bed.
 
-![iso](iso.png)
+---
 
-## Specs
+# ▶ CURRENT VERSION — Lidded Modular Tower  → [`current/`](current/)
+
+**Every tray gets its own identical snap lid; the tower stacks `tray → lid → tray → lid …`,
+so you can build any height and add layers any time.** Corner gap fixed (clean 45° chamfer),
+directed lid drainage, all fits audited.
 
 | | |
 |---|---|
-| **Vial** | Ø16.51 × 37.74 mm (standard 3 mL serum vial) |
-| **Capacity** | 105 cells (100 vials + 5 spare) |
-| **Layout** | 5 × 7 hexagonal grid × 3 vials deep |
-| **Envelope** | **101 × 114 × 115 mm** (aspect 1.13 — near-cube) |
-| **Walls** | 1.2 mm (outer + interstitial), 2 mm floor |
-| **Packing** | hexagonal close-pack; ~1.3 L bounding for ~0.8 L of glass |
+| **Footprint** | 107 × 120 mm (near-cube; ~114×127 incl. skirt) |
+| **Height** | +46.74 mm per layer → **3 layers (105 vials) = 143 mm**, 5 = 237, 10 = 470 |
+| **Print per layer** | 1× `tray` + 1× `stacklid` (top layer can use the flush `lid`) |
+| **Material** | **PETG or PP — not PLA** (PLA goes brittle at freezer temps) |
+| **Verified** | `fit_audit.py` + `checks_lidded.py` all pass; all parts render manifold |
 
-The volume floor for 100 of these vials is ~0.9 L (infinite hex packing); this finite, walled, near-cube lands at ~1.3 L — about as compact as a *usable* hex container gets without going to a 35 cm flat slab.
+**Download the print files (current):**
+- Tray ×N → https://github.com/Blazefit/vial-pack-100/raw/main/current/tray.stl
+- Stacklid ×N → https://github.com/Blazefit/vial-pack-100/raw/main/current/stacklid.stl
+- Flush top lid ×1 → https://github.com/Blazefit/vial-pack-100/raw/main/current/lid.stl
+- Source + audits → [`current/`](current/)
 
-## Files
+> Print **one tray + one stacklid first** to test the snap + stack fit, tune
+> `reg_clr` / `catch_step` / `bore_clear`, then run the rest.
 
-| File | Purpose |
-|---|---|
-| `vial_cube.stl` | **Print this** (binary STL) |
-| `vial_cube.scad` | Parametric source — change vial size, grid, walls |
-| `cutaway_part.scad` | Renders the cutaway view |
-| `pack.py` | Packing optimizer (why 5×7×3 is the near-cube) |
-| `iso.png` / `top.png` / `cutaway.png` | Renders |
+---
 
-## Printing
+# Iteration history → [`iterations/`](iterations/)
 
-- **Orientation:** print standing up — the bores run vertical (Z), so **no supports** inside the cells.
-- **Material:** PETG or PLA (it's a fixture, not wetted). Cold/freezer-safe: PETG preferred.
-- **Walls** are 1.2 mm → use a 0.4 mm nozzle, 3 perimeters.
-- Vials drop into each cell, stacked 3 deep; load/unload from the open top.
+Each folder is a complete, self-contained snapshot of that design stage (reconstructed
+from git history). Newest last.
 
-## Tuning
+| # | Folder | What it was | Why it changed |
+|---|--------|-------------|----------------|
+| 1 | [`iterations/1-bundle-cube`](iterations/1-bundle-cube) | Dense honeycomb cube, vials stacked 3-deep in shared bores | Rule added: every vial needs its **own** holder |
+| 2 | [`iterations/2-trays-sleeve-v1`](iterations/2-trays-sleeve-v1) | Individual pockets in stacking trays + outer sleeve | First individual-holder design |
+| 3 | [`iterations/3-trays-sleeve-v2`](iterations/3-trays-sleeve-v2) | +15 improvements: snap lid, stacking grooves, push-hole, relief holes, corner key, checks | Hardened the tray/sleeve system |
+| 4 | [`iterations/4-sleeveless-tower-v3`](iterations/4-sleeveless-tower-v3) | **Dropped the sleeve** — trays interlock directly; thin-wall tube cups | Cut filament ~52% (~1050 g → ~514 g); fixed bottom-layer access |
+| 5 | [`iterations/5-lidded-stack-v4`](iterations/5-lidded-stack-v4) | **= CURRENT.** Per-tray lids, modular any-height, directed drainage, corner gap fixed | Modular height + sealed-per-layer + corner fix |
 
-Edit the parameters at the top of `vial_cube.scad` and re-render:
+## Design facts (all versions)
+- Vials are sealed by their own crimp + septum → the container never needs to seal the
+  powder. **Open/vented is correct for a freezer** (no condensation trap; meltwater drains).
+- Hexagonal close-packing; ~0.9 L of vials → ~1.0–1.3 L container depending on features.
+- All parts print flat, no supports, on a 220 mm bed.
 
-```bash
-openscad -o vial_cube.stl --export-format=binstl vial_cube.scad
-```
-
-- `bore_clear` — loosen/tighten the vial fit
-- `cols` / `rows` / `deep` — change the grid (keep cols·rows·deep ≥ 100)
-- `wall` — thinner = smaller but weaker
-
-> ⚠️ Verified in software (renders clean, manifold). Measure your actual vials and print one cell-test before committing to the full block.
+## Note on OpenSCAD part files
+Render each part via its `*_part.scad` wrapper. The dispatcher uses a **read-only**
+`part_sel` selector — never re-assign `PART`, or OpenSCAD's last-assignment hoisting
+silently renders the default part for every wrapper.
