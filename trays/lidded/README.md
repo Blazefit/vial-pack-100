@@ -60,19 +60,36 @@ between every 3 cups). They clear the vials below by ~1 mm, so meltwater is rout
 **between** the vials and never drips onto a crimp/septum. Disable with
 `-D lid_drain=false`.
 
-## What changed vs v3 (minimal)
-- `tray()` is **unchanged** — reuses the stock `../tray.stl` (when `SHRINK=false`).
+## What changed vs v3
+- `tray()` is the v3 tray with the **+x/+y corner closed**: the old corner-key
+  *through-notch* cut a 45° cube wider than the 3 mm rim, slicing the corner
+  open. It's now a clean 45° **chamfer** (closed wall, still a one-orientation
+  marker). So the lidded tray no longer matches the stock `../tray.stl`.
 - New `stacklid()` = the v3 lid + a register tongue on top, so the next tray's
   existing bottom groove seats on it (recessed → no extra pitch). It's the
   **universal** lid — print one per tray.
 - `lid()` (no top tongue) is kept only as an **optional flush cap** for the very top.
+
+## Fit & geometry hardening
+Validated every mating interface with `fit_audit.py` (snap, stacking seat, inter-
+layer clearance, vial/drain, printability) and tightened a few:
+- **Corner** — closed (chamfer), matched on tray + lid + tongue for a consistent key.
+- **Snap** — detent 3.0 → 2.6 mm (0.6 mm play, not 1.0) for a crisper click; added
+  a skirt-mouth lead-in so the lid starts over the rim easily.
+- **Drainage** — drain funnel 0.6 → 1.2 mm for better surface-water capture.
+- **Lid fit protected** — the lid's outer corners stay **rounded** (its proven
+  snap/skirt geometry is untouched); only the tray corner is keyed. The snap
+  still engages ~98% of the rim and seats on a flush positive stop.
+- All interfaces PASS (`fit_audit.py`); all three parts re-render manifold.
+
+![tray with the +x/+y corner now closed (45° chamfer)](tray_fixed.png)
 
 ## Print recipe (modular)
 For an **N-layer** tower:
 
 | Part | Qty | File |
 |---|---|---|
-| tray | **N** | `tray.stl` (identical to the stock `../tray.stl`) |
+| tray | **N** | `tray.stl` (v3 tray + closed corner — print this one, not stock) |
 | lid (universal) | **N** | `stacklid.stl` |
 | flush top cap | 0 or 1 | `lid.stl` *(optional — only if you want a flush, non-extendable top)* |
 

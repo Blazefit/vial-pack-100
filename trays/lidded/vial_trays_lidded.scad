@@ -75,7 +75,7 @@ lid_top_t   = SHRINK ? 3.5 : 4.0;
 // vials below (holes sit on the hex interstices -> never over a crimp/septum) ----
 lid_drain     = true;
 lid_drain_d   = 3.0;  // drain hole Ø (3.0 clears the vials below by ~1 mm)
-lid_drain_ch  = 0.6;  // top lead-in chamfer (catch water, keep top mostly flat)
+lid_drain_ch  = 1.2;  // [iter4] top funnel: bigger catch (was 0.6) so surface water finds the hole; still off the vials
 drain_margin  = 0.6;  // min gap from a hole edge to a vial edge below
 
 // ---- derived ----
@@ -115,13 +115,21 @@ module ring(w,d,r,inset_out,thick)             // perimeter ring band
 
 tongue_off = (rim_w - tongue_t)/2;             // center the tongue in the rim
 
-// ---- corner key: a vertical rib (sleeve) / notch (tray) at +x+y corner ----
-module corner_key_solid(h, sz)
-    translate([tray_W/2 - rim_w/2, tray_D/2 - rim_w/2, 0])
-        rotate([0,0,45]) translate([-sz/2,-sz/2,0]) cube([sz,sz,h]);
+// ---- corner key: a clean 45° FLAT across the +x/+y corner (closed wall) so
+// trays have an unambiguous orientation. Replaces the old through-notch, which
+// subtracted a 45° cube WIDER than the 3 mm rim and therefore sliced the corner
+// open. The flat removes only x+y > (tray_W/2 + tray_D/2 - key_sz); all cups are
+// far inside that line, so only the rim/floor corner tip is trimmed.
+module corner_chamfer(w, d, h, z0=-1) {
+    K   = w/2 + d/2 - key_sz;               // cut plane: x + y = K
+    big = 2*(w + d);
+    translate([0,0,z0]) rotate([0,0,45])
+        translate([K/sqrt(2), -big/2, 0]) cube([big, big, h]);
+}
 
 // =====================================================================
-// tray() — UNCHANGED from vial_trays.scad (reuse tray.stl).
+// tray() — v3 tray, but the +x/+y corner is CLOSED with a 45° chamfer instead
+// of the old through-notch (which sliced the rim open). Otherwise identical.
 module tray() {
     difference() {
         union() {
@@ -154,10 +162,11 @@ module tray() {
         // [#10] finger scallops on the cup-block long sides
         for (s=[-1,1]) translate([0,s*tray_D/2,(floor_t+pocket_wall_h)*0.55])
             rotate([90,0,0]) scale([1.8,1,1]) sphere(d=scallop_d);
-        // [#8] corner key NOTCH (trays seat one way; +0.8 fit)
-        corner_key_solid(tray_h+reg_h+1, key_sz+0.8);
-        // [#18] lid-snap detent: shallow recess on the outer face near the top
-        translate([0,0,tray_h-7]) linear_extrude(3)
+        // [#8] corner key: clean 45° flat on the +x/+y corner (closed wall)
+        corner_chamfer(tray_W, tray_D, tray_h+reg_h+3);
+        // [#18] lid-snap detent: outer recess near the top. [iter2] 2.6 mm tall
+        // (was 3.0) centered on the 2 mm bead -> 0.6 mm play instead of 1.0 (less rattle)
+        translate([0,0,tray_h-6.8]) linear_extrude(2.6)
             difference(){ rr(tray_W,tray_D,corner_r);
                           offset(-catch_step) rr(tray_W,tray_D,corner_r); }
     }
@@ -191,6 +200,15 @@ module lid() {
         // [#drain] directed drainage: holes on the hex interstices route melt-
         // water DOWN between the vials below (never onto a crimp/septum)
         if (lid_drain) lid_drains();
+        // NOTE: the lid's outer corners stay ROUNDED (proven snap/skirt geometry).
+        // We deliberately do NOT chamfer the lid corner — it would thin the skirt
+        // wall at that corner and risk the fit. Only the tray corner is keyed.
+        // [iter3] skirt-mouth lead-in: flare the inner bottom edge so the lid
+        // starts over the tray rim instead of fighting it
+        translate([0,0,-skirt_h-0.01]) hull() {
+            linear_extrude(0.01) rr(sk_in_w+2*lead_ch, sk_in_d+2*lead_ch, corner_r+lead_ch);
+            translate([0,0,lead_ch]) linear_extrude(0.01) rr(sk_in_w, sk_in_d, corner_r);
+        }
     }
 }
 
@@ -213,9 +231,13 @@ module lid_drains() {
 // plate: the tongue is recessed into the next tray's groove.
 module stacklid() {
     lid();                                       // reuse the full lid (snap + underside groove + grip)
-    // top register tongue (mirrors the tray's top tongue so a tray seats on it)
-    translate([0,0,lid_top_t-0.01]) linear_extrude(reg_h)
-        ring(tray_W,tray_D,corner_r,tongue_off,tongue_t);
+    // top register tongue (mirrors the tray's top tongue so a tray seats on it);
+    // [iter1] chamfer its +x/+y corner so it matches the tray/lid corner key
+    difference() {
+        translate([0,0,lid_top_t-0.01]) linear_extrude(reg_h)
+            ring(tray_W,tray_D,corner_r,tongue_off,tongue_t);
+        corner_chamfer(tray_W, tray_D, reg_h+3, lid_top_t-1);
+    }
 }
 
 // ---- part dispatch (read-only selector; never re-assign PART) ----
