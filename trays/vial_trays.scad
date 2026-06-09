@@ -17,10 +17,12 @@ rows     = 7;
 
 // ---- fits / walls ----
 bore_clear = 0.6;     // vial radial fit (drop-in)
-wall_btw   = 1.5;     // interstitial wall between pockets
-rim_w      = 4.0;     // perimeter frame width (hosts tongue/groove)
-floor_t    = 2.5;     // tray floor
+wall_btw   = 1.5;     // hex pitch spacing between pockets
+cup_wall   = 1.2;     // [#17] thin cup-tube wall (light)
+rim_w      = 3.0;     // perimeter frame width (hosts tongue/groove)
+floor_t    = 2.0;     // tray floor
 v_clear    = 3.0;     // [#1] vertical clearance above each vial
+pocket_wall_h = 22.0; // [#16] cup depth: holds vial's lower half; open above = less plastic
 corner_r   = 4.0;
 slide_clr  = 0.5;     // [#12] tray-in-sleeve slide fit
 
@@ -34,13 +36,10 @@ key_sz         = 5.0; // [#8] corner key size
 lead_ch        = 1.5; // [#9/#13] lead-in / edge chamfers
 scallop_d      = 20;  // [#10] finger scallop
 
-// ---- sleeve / lid ----
-base_t      = 2.5;
-push_hole_d = 30;     // [#4] bottom-layer push hole
-win_w       = 34;     // [#5] side window width
-skirt_h     = 12;     // [#3] lid skirt
-catch_step  = 1.0;    // [#3] snap catch depth
-lid_top_t   = 2.5;
+// ---- lid (clips onto the TOP tray; no sleeve — [#18] sleeve removed) ----
+skirt_h     = 11;     // [#3] lid skirt over the top tray
+catch_step  = 0.9;    // [#3] snap catch depth
+lid_top_t   = 4.0;
 
 // ---- derived ----
 bore_d  = vial_d + bore_clear;
@@ -55,11 +54,7 @@ tray_W = xext + bore_d + 2*rim_w;
 tray_D = yext + bore_d + 2*rim_w;
 tray_h = floor_t + vial_h + v_clear;           // wall top sits v_clear above vial
 
-sleeve_in_w = tray_W + 2*slide_clr;
-sleeve_in_d = tray_D + 2*slide_clr;
-sleeve_W = sleeve_in_w + 2*rim_w;
-sleeve_D = sleeve_in_d + 2*rim_w;
-sleeve_h = base_t + 3*tray_h + reg_h + 1;      // base + 3 trays (+top tongue room)
+stack_h = 3*tray_h + lid_top_t;                // [#18] tower height (3 trays + lid)
 
 // ---- 2D helpers ----
 module rr(w,d,r) offset(r) square([max(0.1,w-2*r), max(0.1,d-2*r)], center=true);
@@ -77,19 +72,25 @@ module corner_key_solid(h, sz)
 module tray() {
     difference() {
         union() {
-            // frame body with chamfered top edge
+            // [#17] thin floor plate (chamfered edge) — relief holes punched later
             hull() {
-                linear_extrude(tray_h-lead_ch) rr(tray_W, tray_D, corner_r);
-                linear_extrude(tray_h)        rr(tray_W-2*lead_ch, tray_D-2*lead_ch, corner_r);
+                linear_extrude(floor_t-0.6) rr(tray_W, tray_D, corner_r);
+                linear_extrude(floor_t)     rr(tray_W-1.2, tray_D-1.2, corner_r);
             }
+            // [#17] thin-wall cup TUBES (open between cups -> ~half the plastic)
+            for (p=positions()) translate([p[0],p[1],floor_t-0.01])
+                cylinder(d=bore_d+2*cup_wall, h=pocket_wall_h);
+            // perimeter FRAME ring (full height) carries the stack + hosts grooves
+            translate([0,0,floor_t-0.01])
+                linear_extrude(tray_h-floor_t) ring(tray_W,tray_D,corner_r,0,rim_w);
             // [#2] top tongue ring
             translate([0,0,tray_h-0.01])
                 linear_extrude(reg_h) ring(tray_W,tray_D,corner_r,tongue_off,tongue_t);
         }
-        // pockets: bore + [#6] mouth chamfer + [#7] relief hole
+        // cups: bore + [#6] mouth chamfer + [#7] relief/push hole
         for (p=positions()) {
-            translate([p[0],p[1],floor_t]) cylinder(d=bore_d, h=tray_h);
-            translate([p[0],p[1],tray_h-pocket_chamfer+0.01])
+            translate([p[0],p[1],floor_t]) cylinder(d=bore_d, h=pocket_wall_h+0.1);
+            translate([p[0],p[1],floor_t+pocket_wall_h-pocket_chamfer+0.01])
                 cylinder(d1=bore_d, d2=bore_d+2*pocket_chamfer, h=pocket_chamfer);
             translate([p[0],p[1],-1]) cylinder(d=relief_d, h=floor_t+2);
         }
@@ -97,72 +98,52 @@ module tray() {
         translate([0,0,-0.01])
             linear_extrude(reg_h+0.4)
                 ring(tray_W,tray_D,corner_r,tongue_off-reg_clr,tongue_t+2*reg_clr);
-        // [#10] finger scallops on long sides
-        for (s=[-1,1]) translate([0,s*tray_D/2,tray_h*0.6])
+        // [#10] finger scallops on the cup-block long sides
+        for (s=[-1,1]) translate([0,s*tray_D/2,(floor_t+pocket_wall_h)*0.55])
             rotate([90,0,0]) scale([1.8,1,1]) sphere(d=scallop_d);
-        // [#8] corner key NOTCH (clears the sleeve rib; +0.8 fit)
+        // [#8] corner key NOTCH (trays seat one way; +0.8 fit)
         corner_key_solid(tray_h+reg_h+1, key_sz+0.8);
+        // [#18] lid-snap detent: shallow recess on the outer face near the top
+        translate([0,0,tray_h-7]) linear_extrude(3)
+            difference(){ rr(tray_W,tray_D,corner_r);
+                          offset(-catch_step) rr(tray_W,tray_D,corner_r); }
     }
 }
 
 // =====================================================================
-module sleeve() {
-    difference() {
-        union() {
-            linear_extrude(sleeve_h) rr(sleeve_W, sleeve_D, corner_r+rim_w);
-            // [#3] catch lip: outward bead near the top for the lid to snap under
-            translate([0,0,sleeve_h-3])
-                linear_extrude(3) difference(){
-                    offset(catch_step) rr(sleeve_W,sleeve_D,corner_r+rim_w);
-                    rr(sleeve_W-2*rim_w, sleeve_D-2*rim_w, corner_r); }
-        }
-        // inner cavity
-        translate([0,0,base_t]) linear_extrude(sleeve_h) rr(sleeve_in_w, sleeve_in_d, corner_r);
-        // [#4] push-hole in base
-        translate([0,0,-1]) cylinder(d=push_hole_d, h=base_t+2);
-        // [#5] side windows (short ends) so all trays incl. bottom are reachable
-        for (s=[-1,1]) translate([s*sleeve_W/2, 0, base_t+ tray_h*0.5])
-            rotate([0,90,0]) translate([0,0,-rim_w-1])
-                linear_extrude(rim_w+2) offset(4) square([2.4*tray_h, win_w], center=true);
-    }
-    // [#8] corner key RIB into the cavity — only the keyed (notched) tray clears it
-    intersection() {
-        corner_key_solid(sleeve_h, key_sz);
-        translate([0,0,base_t]) linear_extrude(sleeve_h) rr(sleeve_in_w, sleeve_in_d, corner_r);
-    }
-}
-
-// =====================================================================
+// [#18] LID — clips onto the TOP tray (no sleeve). Tongue-groove register +
+// friction skirt + snap bead into the tray's outer detent.
 module lid() {
-    skirt_in_w = sleeve_W + 2*0.3;     // friction over sleeve outer
-    skirt_in_d = sleeve_D + 2*0.3;
+    sk_in_w = tray_W + 0.8;            // friction over top tray's outer
+    sk_in_d = tray_D + 0.8;
     difference() {
         union() {
-            // top plate
-            linear_extrude(lid_top_t) rr(skirt_in_w+2*rim_w, skirt_in_d+2*rim_w, corner_r+rim_w);
-            // skirt
+            // top plate (thick enough to host the tongue groove on its underside)
+            linear_extrude(lid_top_t) rr(sk_in_w+2*rim_w, sk_in_d+2*rim_w, corner_r+rim_w);
+            // skirt down over the top tray
             translate([0,0,-skirt_h]) linear_extrude(skirt_h)
-                difference(){ rr(skirt_in_w+2*rim_w, skirt_in_d+2*rim_w, corner_r+rim_w);
-                              rr(skirt_in_w, skirt_in_d, corner_r); }
+                difference(){ rr(sk_in_w+2*rim_w, sk_in_d+2*rim_w, corner_r+rim_w);
+                              rr(sk_in_w, sk_in_d, corner_r); }
+            // [#3] inward snap bead near skirt bottom -> clicks into tray detent
+            translate([0,0,-6.5]) linear_extrude(2)
+                difference(){ rr(sk_in_w, sk_in_d, corner_r);
+                              offset(-catch_step) rr(sk_in_w, sk_in_d, corner_r); }
         }
-        // [#3] inner catch bead near skirt bottom (snaps under sleeve lip)
-        translate([0,0,-skirt_h+1]) linear_extrude(2.2)
-            difference(){ rr(skirt_in_w, skirt_in_d, corner_r);
-                          offset(-catch_step) rr(skirt_in_w, skirt_in_d, corner_r); }
+        // [#2] groove on underside receives the top tray's tongue (register)
+        translate([0,0,-0.01]) linear_extrude(reg_h+0.4)
+            ring(tray_W,tray_D,corner_r,tongue_off-reg_clr,tongue_t+2*reg_clr);
         // [#11] grip recess on top
-        translate([0,0,lid_top_t-1]) linear_extrude(1.5)
-            difference(){ rr(skirt_in_w*0.5, skirt_in_d*0.5, 8);
-                          rr(skirt_in_w*0.5-6, skirt_in_d*0.5-6, 6); }
+        translate([0,0,lid_top_t-1.2]) linear_extrude(1.4)
+            difference(){ rr(sk_in_w*0.55, sk_in_d*0.55, 8);
+                          rr(sk_in_w*0.55-7, sk_in_d*0.55-7, 6); }
     }
 }
 
 // ---- part dispatch (read-only selector; never re-assign PART) ----
 part_sel = is_undef(PART) ? "tray" : PART;
 if (part_sel=="tray") tray();
-else if (part_sel=="sleeve") sleeve();
 else if (part_sel=="lid") lid();
 else if (part_sel=="assembly") {
-    color("gray")   sleeve();
-    for (i=[0:2]) translate([0,0,base_t + i*tray_h]) color(i%2?"steelblue":"slategray") tray();
-    translate([0,0,sleeve_h]) color("seagreen") lid();
+    for (i=[0:2]) translate([0,0,i*tray_h]) color(i%2?"steelblue":"slategray") tray();
+    translate([0,0,3*tray_h]) color("seagreen") lid();
 }
