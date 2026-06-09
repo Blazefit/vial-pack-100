@@ -25,6 +25,8 @@ Every lid is a `stacklid`, so each `(tray + stacklid)` unit is a repeatable modu
 printed parts don't change**; you just print one more `tray` + one more `stacklid`
 for each extra layer.
 
+![modular stacking — 1/3/5/10 layers, to scale](modular_stack.svg)
+
 | Layers | Vials | Height (extendable) | Height (flush cap) |
 |---:|---:|---:|---:|
 | 1 | 35 | 49.7 mm | 46.7 mm |
