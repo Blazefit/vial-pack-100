@@ -5,7 +5,9 @@ the trays interlocking **directly** (tongue→groove, one lid on top), **every t
 gets its own lid** and the tower stacks `tray → lid → tray → lid → tray → lid`.
 Each layer becomes an independently snap-closed, liftable module.
 
-![stacklid](stacklid.png)
+| Tower (3 trays + 3 lids) | Stacklid (drain holes + register tongue) |
+|---|---|
+| ![assembly](assembly_lidded.png) | ![stacklid](stacklid.png) |
 
 | | v3 sleeveless | **v4 lidded** |
 |---|---|---|
