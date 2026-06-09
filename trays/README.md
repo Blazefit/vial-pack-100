@@ -2,7 +2,7 @@
 
 Open/vented, freezer-friendly, **cheap to print**. Each vial in its own cup; three identical 5×7 hex trays interlock via tongue/groove into a self-stacking tower; a snap lid clips onto the top tray. **No sleeve.**
 
-> 🧪 **Variant:** [`lidded/`](lidded/) — a test version where **every tray gets its own lid** and the tower stacks lid-to-lid, with directed drain perforations. +8 mm taller (140 mm); footprint unchanged.
+> 🧪 **Variant:** [`lidded/`](lidded/) — a **modular** test version where **every tray gets its own identical lid** and the tower stacks lid-to-lid, with directed drain perforations. Stack any number of layers (+46.74 mm each); footprint unchanged.
 
 ![cutaway](cutaway.png)
 

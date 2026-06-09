@@ -19,6 +19,16 @@ $fn = 48;
 // read it. See the note at lid_top_t below. Recommended default: false.
 SHRINK = false;
 
+// ---- stacking (fully modular) ----
+// Every tray is capped by an identical `stacklid`, so the tower is infinitely
+// extendable: stack as MANY layers as you like, add more any time. LAYERS only
+// drives the assembly/height preview — the printed parts are independent of it.
+LAYERS    = 3;       // trays in the previewed tower (set to whatever you want)
+// FLUSH_TOP=false keeps the topmost lid a stacklid (its register tongue stays
+// exposed = ready to extend). Set true to finish the very top with the plain
+// `lid()` (flush, no tongue) — cleaner top, but then you can't stack onto it.
+FLUSH_TOP = false;
+
 // ---- vial + grid ----
 vial_d   = 16.51;
 vial_h   = 37.74;
@@ -82,9 +92,10 @@ tray_D = yext + bore_d + 2*rim_w;
 tray_h = floor_t + vial_h + v_clear;           // wall top sits v_clear above vial
 
 // [#lidded] each tray is capped by its own lid; the next tray stacks on that
-// lid's top plate (the tongue/groove is recessed and adds no pitch).
+// lid's top plate (the inter-layer tongue/groove is recessed and adds no pitch).
+// Only the TOPMOST exposed tongue adds reg_h — and only when not FLUSH_TOP.
 stack_pitch = tray_h + lid_top_t;              // per-layer rise (tray + its lid plate)
-stack_h     = 3*tray_h + 3*lid_top_t;          // lidded tower (3 trays + 3 lid plates)
+stack_h     = LAYERS*stack_pitch + (FLUSH_TOP ? 0 : reg_h);  // any number of layers
 
 // ---- lid drain points: hex INTERSTICES (centroids of the triangular voids
 // between 3 cups). Each is equidistant from its 3 surrounding vials = the only
@@ -210,19 +221,23 @@ module stacklid() {
 // ---- part dispatch (read-only selector; never re-assign PART) ----
 part_sel = is_undef(PART) ? "tray" : PART;
 if      (part_sel=="tray")     tray();
-else if (part_sel=="lid")      lid();           // top cap (unchanged)
-else if (part_sel=="stacklid") stacklid();      // intermediate lid (new)
+else if (part_sel=="stacklid") stacklid();      // UNIVERSAL lid: snaps on + lets a tray stack on top -> print one per tray
+else if (part_sel=="lid")      lid();           // OPTIONAL flush cap: no top tongue, so nothing stacks on it
 else if (part_sel=="assembly") {
-    // tower: 3 trays, each capped by a lid; intermediates are stacklids,
-    // the top one is a plain lid (no protruding tongue at the very top).
-    for (i=[0:2]) {
+    // fully modular tower: EVERY tray capped by an identical stacklid, so you
+    // can stack any number. FLUSH_TOP=true finishes the very top with lid().
+    for (i=[0:LAYERS-1]) {
         translate([0,0,i*stack_pitch]) color(i%2?"steelblue":"slategray") tray();
         translate([0,0,i*stack_pitch + tray_h]) color("seagreen") {
-            if (i<2) stacklid(); else lid();
+            if (FLUSH_TOP && i==LAYERS-1) lid(); else stacklid();
         }
     }
 }
-echo(str("LIDDED tower H = ", stack_h, " mm  (sleeveless v3 was ", 3*tray_h+lid_top_t,
-         " mm; delta +", stack_h-(3*tray_h+lid_top_t), " mm)"));
+echo(str("LIDDED tower: ", LAYERS, " trays + ", LAYERS, " stacklids = ",
+         LAYERS*cols*rows, " vials, H = ", stack_h, " mm",
+         FLUSH_TOP ? " (flush top)" : " (extendable top tongue)"));
+echo(str("per-layer pitch = ", stack_pitch, " mm  ->  add 1 layer = +",
+         stack_pitch, " mm. Print ", LAYERS, "x tray + ", LAYERS, "x stacklid",
+         FLUSH_TOP ? " + 1x lid (flush cap)" : ""));
 echo(str("drain holes per lid = ", len(lid_drain_pts()), "  (O", lid_drain_d,
          " on hex interstices; SHRINK=", SHRINK, ", reg_h=", reg_h, ", lid_top_t=", lid_top_t, ")"));
