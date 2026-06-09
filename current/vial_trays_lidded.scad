@@ -39,8 +39,8 @@ rows     = 7;
 bore_clear = 0.6;     // vial radial fit (drop-in)
 wall_btw   = 1.5;     // hex pitch spacing between pockets
 cup_wall   = 1.2;     // [#17] thin cup-tube wall (light)
-rim_w      = 3.0;     // perimeter frame width (hosts tongue/groove)
-floor_t    = 2.0;     // tray floor
+rim_w      = 2.5;     // [#3] perimeter frame width (trimmed 3.0->2.5: lighter + 1 mm smaller/side)
+floor_t    = 1.6;     // [#3] tray floor (trimmed 2.0->1.6)
 v_clear    = 3.0;     // [#1] vertical clearance above each vial
 pocket_wall_h = 22.0; // [#16] cup depth: holds vial's lower half; open above = less plastic
 corner_r   = 4.0;
@@ -55,6 +55,12 @@ reg_clr        = 0.4; // [#12] tongue/groove clearance
 key_sz         = 5.0; // [#8] corner key size
 lead_ch        = 1.5; // [#9/#13] lead-in / edge chamfers
 scallop_d      = 20;  // [#10] finger scallop
+// [#19] retention nubs at cup mouth (vial doesn't fall out of a lifted tray)
+nub_d        = 1.8;
+nub_protrude = 0.5;
+// [#21] engraved row/column IDs + a write-on label recess
+engrave_d    = 0.7;
+label_w_     = 30; label_h_ = 8; label_depth = 0.8;
 
 // ---- lid (clips onto a tray; no sleeve — [#18] sleeve removed) ----
 skirt_h     = 11;     // [#3] lid skirt over the tray
@@ -131,7 +137,10 @@ module corner_chamfer(w, d, h, z0=-1) {
 // tray() — v3 tray, but the +x/+y corner is CLOSED with a 45° chamfer instead
 // of the old through-notch (which sliced the rim open). Otherwise identical.
 module tray() {
-    difference() {
+    cup_top = floor_t + pocket_wall_h;
+    nr = bore_d/2 - nub_protrude + nub_d/2;        // nub center radius
+    union() {
+      difference() {
         union() {
             // [#17] thin floor plate (chamfered edge) — relief holes punched later
             hull() {
@@ -151,7 +160,7 @@ module tray() {
         // cups: bore + [#6] mouth chamfer + [#7] relief/push hole
         for (p=positions()) {
             translate([p[0],p[1],floor_t]) cylinder(d=bore_d, h=pocket_wall_h+0.1);
-            translate([p[0],p[1],floor_t+pocket_wall_h-pocket_chamfer+0.01])
+            translate([p[0],p[1],cup_top-pocket_chamfer+0.01])
                 cylinder(d1=bore_d, d2=bore_d+2*pocket_chamfer, h=pocket_chamfer);
             translate([p[0],p[1],-1]) cylinder(d=relief_d, h=floor_t+2);
         }
@@ -160,16 +169,35 @@ module tray() {
             linear_extrude(reg_h+0.4)
                 ring(tray_W,tray_D,corner_r,tongue_off-reg_clr,tongue_t+2*reg_clr);
         // [#10] finger scallops on the cup-block long sides
-        for (s=[-1,1]) translate([0,s*tray_D/2,(floor_t+pocket_wall_h)*0.55])
+        for (s=[-1,1]) translate([0,s*tray_D/2,cup_top*0.55])
             rotate([90,0,0]) scale([1.8,1,1]) sphere(d=scallop_d);
         // [#8] corner key: clean 45° flat on the +x/+y corner (closed wall)
         corner_chamfer(tray_W, tray_D, tray_h+reg_h+3);
-        // [#18] lid-snap detent: outer recess near the top. [iter2] 2.6 mm tall
-        // (was 3.0) centered on the 2 mm bead -> 0.6 mm play instead of 1.0 (less rattle)
+        // [#18] lid-snap detent: outer recess near the top
         translate([0,0,tray_h-6.8]) linear_extrude(2.6)
             difference(){ rr(tray_W,tray_D,corner_r);
                           offset(-catch_step) rr(tray_W,tray_D,corner_r); }
+        // [#2/#21] engraved row/column IDs + write-on label recess
+        engrave_ids();
+      }
+      // [#4/#19] retention nubs at each cup mouth (after bores so they survive);
+      // ~0.2 mm interference -> vial clicks in, won't drop from a lifted tray
+      for (p=positions()) for (a=[0:120:359])
+          translate([p[0]+nr*cos(a), p[1]+nr*sin(a), cup_top-2.5]) sphere(d=nub_d);
     }
+}
+
+// [#21] engraved column letters (+Y face), row numbers (+X face), label recess (-X)
+module engrave_ids() {
+    for (c=[0:cols-1]) translate([c*pitch - xext/2, tray_D/2, tray_h-3.6])
+        rotate([90,0,0]) linear_extrude(2*engrave_d, center=true)
+            text(chr(65+c), size=3.0, halign="center", valign="center");
+    for (r=[0:rows-1]) translate([tray_W/2, r*rowp - yext/2, tray_h-3.6])
+        rotate([90,0,90]) linear_extrude(2*engrave_d, center=true)
+            text(str(r+1), size=2.8, halign="center", valign="center");
+    translate([-tray_W/2, 0, tray_h*0.5]) rotate([90,0,90])
+        linear_extrude(2*label_depth, center=true)
+            offset(1.2) square([label_h_, label_w_], center=true);
 }
 
 // =====================================================================
@@ -229,14 +257,28 @@ module lid_drains() {
 // Snaps to its own tray below (lid()'s skirt+bead+underside groove) and
 // presents a tongue up top for the tray above. Adds no pitch beyond the lid
 // plate: the tongue is recessed into the next tray's groove.
+// [#1] SKIRTLESS flat drain-plate. Rests on its tray (underside groove over the
+// tray's top tongue) and presents a top tongue for the tray above. No skirt/snap,
+// so it prints PLATE-ON-BED support-free, is lighter, and adds no skirt overhang
+// (footprint = tray). The top cap lid() keeps the skirt+snap to secure the tower.
 module stacklid() {
-    lid();                                       // reuse the full lid (snap + underside groove + grip)
-    // top register tongue (mirrors the tray's top tongue so a tray seats on it);
-    // [iter1] chamfer its +x/+y corner so it matches the tray/lid corner key
     difference() {
-        translate([0,0,lid_top_t-0.01]) linear_extrude(reg_h)
-            ring(tray_W,tray_D,corner_r,tongue_off,tongue_t);
-        corner_chamfer(tray_W, tray_D, reg_h+3, lid_top_t-1);
+        union() {
+            linear_extrude(lid_top_t) rr(tray_W, tray_D, corner_r);
+            // top register tongue (corner-keyed to match the tray)
+            difference() {
+                translate([0,0,lid_top_t-0.01]) linear_extrude(reg_h)
+                    ring(tray_W,tray_D,corner_r,tongue_off,tongue_t);
+                corner_chamfer(tray_W, tray_D, reg_h+3, lid_top_t-1);
+            }
+        }
+        // underside register groove (receives the tray-below top tongue)
+        translate([0,0,-0.01]) linear_extrude(reg_h+0.4)
+            ring(tray_W,tray_D,corner_r,tongue_off-reg_clr,tongue_t+2*reg_clr);
+        // match the tray corner key
+        corner_chamfer(tray_W, tray_D, lid_top_t+reg_h+3);
+        // [#drain] directed drainage onto the hex interstices below
+        if (lid_drain) lid_drains();
     }
 }
 

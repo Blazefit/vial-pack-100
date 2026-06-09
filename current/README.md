@@ -1,11 +1,24 @@
-# Lidded-stack variant (v4-lidded) — modular TEST VERSION
+# Lidded-stack variant (v5) — modular, design-reviewed
 
-A separate, opt-in variant of the [sleeveless tray tower](../README.md). Instead of
-the trays interlocking **directly** (tongue→groove, one lid on top), **every tray
-gets its own identical lid** (`stacklid`) and the tower stacks
-`tray → lid → tray → lid → …`. Each layer is a self-contained, snap-closed,
-liftable module — and because every lid is the same, the tower is **fully modular:
-stack as many layers as you like and add more any time.**
+A separate, opt-in variant of the [sleeveless tray tower](../README.md). **Every tray
+gets its own identical lid** (`stacklid`) and the tower stacks `tray → lid → tray → …`
+— **fully modular: stack as many layers as you like, add more any time.**
+
+## v5 improvements (4 design-review changes; none make it bigger)
+1. **Stacklid is now skirtless** — a flat drain-plate that rests on its tray (underside
+   groove over the tray's top tongue) and presents a tongue up for the next tray. It now
+   **prints plate-on-bed support-free** (the old skirt+tongue couldn't), is lighter
+   (~68→47 cm³), and removes the skirt overhang (middle layers = tray footprint).
+   The **top cap lid keeps the skirt + snap** to secure the tower.
+2. **Engraved IDs** — column letters **A–E** (long face) + row numbers **1–7** (short
+   face) so any of 100 vials has an address, plus a **write-on label recess** for layer/contents.
+3. **Lighter frame** — rim trimmed 3.0→2.5 mm + floor 2.0→1.6 mm (tray 112→99 cm³; also
+   ~1 mm smaller per side).
+4. **Retention nubs** — 3 tiny nubs at each cup mouth (~0.2 mm interference) so a vial
+   clicks in and **won't fall out of a tray you lift off the stack**.
+
+Footprint now ~**106 × 119 mm**; 3-layer tower ~440 cm³ (~560 g PETG). All parts render
+manifold; `fit_audit.py` + `checks_lidded.py` pass.
 
 | Tower (5 layers — stack any number) | Stacklid (drain holes + register tongue) |
 |---|---|
