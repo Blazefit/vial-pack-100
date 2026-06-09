@@ -13,8 +13,8 @@ directed lid drainage, all fits audited.
 
 | | |
 |---|---|
-| **Footprint** | 107 × 120 mm (near-cube; ~114×127 incl. skirt) |
-| **Height** | +46.74 mm per layer → **3 layers (105 vials) = 143 mm**, 5 = 237, 10 = 470 |
+| **Footprint** | 106 × 119 mm (near-cube; top-cap lid ~114×127) |
+| **Height** | +46.34 mm per layer → **3 layers (105 vials) = 142 mm**, 5 = 235, 10 = 466 |
 | **Print per layer** | 1× `tray` + 1× `stacklid` (top layer can use the flush `lid`) |
 | **Material** | **PETG or PP — not PLA** (PLA goes brittle at freezer temps) |
 | **Verified** | `fit_audit.py` + `checks_lidded.py` all pass; all parts render manifold |

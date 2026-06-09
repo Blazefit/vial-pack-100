@@ -6,7 +6,7 @@ import math, sys
 
 vial_d, vial_h = 16.51, 37.74
 cols, rows = 5, 7
-bore_clear, wall_btw, cup_wall, rim_w, floor_t, v_clear = 0.6, 1.5, 1.2, 3.0, 2.0, 3.0
+bore_clear, wall_btw, cup_wall, rim_w, floor_t, v_clear = 0.6, 1.5, 1.2, 2.5, 1.6, 3.0
 pocket_wall_h = 22.0
 pocket_chamfer, relief_d = 1.2, 6.0
 reg_h, tongue_t, reg_clr = 3.0, 2.0, 0.4

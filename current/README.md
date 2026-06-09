@@ -28,8 +28,8 @@ manifold; `fit_audit.py` + `checks_lidded.py` pass.
 |---|---|---|
 | Lids | 1 (top only) | **1 identical `stacklid` per tray** |
 | Stacks via | tray-on-tray groove | **lid top plate** (register tongue) |
-| Max height | fixed 3-tray tower | **unlimited** — add a layer = +46.74 mm |
-| 3-layer envelope | 107 × 120 × **132** mm | 107 × 120 × **143** mm (or **140** flush) |
+| Max height | fixed 3-tray tower | **unlimited** — add a layer = +46.34 mm |
+| 3-layer envelope | 107 × 120 × **132** mm | 106 × 119 × **142** mm (or **139** flush) |
 | Drainage | relief holes drain down | **directed lid perforations** (see below) |
 
 ## Stack any height (the modular part)
@@ -42,14 +42,14 @@ for each extra layer.
 
 | Layers | Vials | Height (extendable) | Height (flush cap) |
 |---:|---:|---:|---:|
-| 1 | 35 | 49.7 mm | 46.7 mm |
-| 2 | 70 | 96.5 mm | 93.5 mm |
-| **3** | **105** | **143.2 mm** | **140.2 mm** |
-| 5 | 175 | 236.7 mm | 233.7 mm |
-| 10 | 350 | 470.4 mm | 467.4 mm |
+| 1 | 35 | 49.3 mm | 46.3 mm |
+| 2 | 70 | 95.7 mm | 92.7 mm |
+| **3** | **105** | **142.0 mm** | **139.0 mm** |
+| 5 | 175 | 234.7 mm | 231.7 mm |
+| 10 | 350 | 466.4 mm | 463.4 mm |
 
-Footprint stays **107 × 120 mm** at any height. Per-layer pitch is a constant
-**46.74 mm** (tray 42.74 + lid plate 4.0); the inter-layer tongues recess into the
+Footprint stays **106 × 119 mm** at any height. Per-layer pitch is a constant
+**46.34 mm** (tray 42.34 + lid plate 4.0); the inter-layer tongues recess into the
 grooves and add nothing.
 
 ### Why the topmost lid used to be different — and isn't anymore
