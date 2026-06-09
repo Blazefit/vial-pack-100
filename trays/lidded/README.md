@@ -7,9 +7,9 @@ gets its own identical lid** (`stacklid`) and the tower stacks
 liftable module — and because every lid is the same, the tower is **fully modular:
 stack as many layers as you like and add more any time.**
 
-| Tower (3 layers) | Stacklid (drain holes + register tongue) |
+| Tower (5 layers — stack any number) | Stacklid (drain holes + register tongue) |
 |---|---|
-| ![assembly](assembly_lidded.png) | ![stacklid](stacklid.png) |
+| ![tower](tower_5layer.png) | ![stacklid](stacklid.png) |
 
 | | v3 sleeveless | **v4 lidded (modular)** |
 |---|---|---|
