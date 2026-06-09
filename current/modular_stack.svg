@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="526" height="526" font-family="Segoe UI, sans-serif">
 <rect width="526" height="526" fill="#0e1217"/>
-<text x="263" y="30" fill="#e8eef5" font-size="17" font-weight="600" text-anchor="middle">Same lid every layer &#8594; stack as many as you like (+46.7 mm each)</text>
+<text x="263" y="30" fill="#e8eef5" font-size="17" font-weight="600" text-anchor="middle">Same lid every layer &#8594; stack as many as you like (+46.3 mm each)</text>
 <text x="263" y="50" fill="#9aa7b5" font-size="11.5" text-anchor="middle">green = stacklid plate &#183; gold nub = exposed top register tongue (cap it flush with one lid.stl)</text>
 <line x1="40" y1="455.7" x2="496" y2="455.7" stroke="#2a3340" stroke-width="1.5"/>
 <rect x="70" y="420.7" width="70" height="35.0" fill="#3f5366" stroke="#10161d" stroke-width="1" rx="2"/>
@@ -8,7 +8,7 @@
 <rect x="83" y="414.9" width="45" height="2.5" fill="#e0b341" stroke="#8a6a16" stroke-width="0.8"/>
 <text x="105" y="478" fill="#e8eef5" font-size="14" font-weight="600" text-anchor="middle">1 layer</text>
 <text x="105" y="496" fill="#8fb0c9" font-size="11.5" text-anchor="middle">35 vials</text>
-<text x="105" y="512" fill="#7fd3a3" font-size="11.5" text-anchor="middle">50 mm</text>
+<text x="105" y="512" fill="#7fd3a3" font-size="11.5" text-anchor="middle">47 mm</text>
 <line x1="64" y1="417.4" x2="146" y2="417.4" stroke="#9aa7b5" stroke-width="0.7" stroke-dasharray="3 3" opacity="0.5"/>
 <rect x="184" y="420.7" width="70" height="35.0" fill="#3f5366" stroke="#10161d" stroke-width="1" rx="2"/>
 <rect x="180" y="417.4" width="78" height="3.3" fill="#3f9e6b" stroke="#16472f" stroke-width="1" rx="1.5"/>
@@ -19,7 +19,7 @@
 <rect x="197" y="338.3" width="45" height="2.5" fill="#e0b341" stroke="#8a6a16" stroke-width="0.8"/>
 <text x="219" y="478" fill="#e8eef5" font-size="14" font-weight="600" text-anchor="middle">3 layers</text>
 <text x="219" y="496" fill="#8fb0c9" font-size="11.5" text-anchor="middle">105 vials</text>
-<text x="219" y="512" fill="#7fd3a3" font-size="11.5" text-anchor="middle">143 mm</text>
+<text x="219" y="512" fill="#7fd3a3" font-size="11.5" text-anchor="middle">140 mm</text>
 <line x1="178" y1="340.7" x2="260" y2="340.7" stroke="#9aa7b5" stroke-width="0.7" stroke-dasharray="3 3" opacity="0.5"/>
 <rect x="298" y="420.7" width="70" height="35.0" fill="#3f5366" stroke="#10161d" stroke-width="1" rx="2"/>
 <rect x="294" y="417.4" width="78" height="3.3" fill="#3f9e6b" stroke="#16472f" stroke-width="1" rx="1.5"/>
@@ -34,7 +34,7 @@
 <rect x="311" y="261.6" width="45" height="2.5" fill="#e0b341" stroke="#8a6a16" stroke-width="0.8"/>
 <text x="333" y="478" fill="#e8eef5" font-size="14" font-weight="600" text-anchor="middle">5 layers</text>
 <text x="333" y="496" fill="#8fb0c9" font-size="11.5" text-anchor="middle">175 vials</text>
-<text x="333" y="512" fill="#7fd3a3" font-size="11.5" text-anchor="middle">237 mm</text>
+<text x="333" y="512" fill="#7fd3a3" font-size="11.5" text-anchor="middle">233 mm</text>
 <line x1="292" y1="264.1" x2="374" y2="264.1" stroke="#9aa7b5" stroke-width="0.7" stroke-dasharray="3 3" opacity="0.5"/>
 <rect x="412" y="420.7" width="70" height="35.0" fill="#3f5366" stroke="#10161d" stroke-width="1" rx="2"/>
 <rect x="408" y="417.4" width="78" height="3.3" fill="#3f9e6b" stroke="#16472f" stroke-width="1" rx="1.5"/>
@@ -59,6 +59,6 @@
 <rect x="425" y="70.0" width="45" height="2.5" fill="#e0b341" stroke="#8a6a16" stroke-width="0.8"/>
 <text x="447" y="478" fill="#e8eef5" font-size="14" font-weight="600" text-anchor="middle">10 layers</text>
 <text x="447" y="496" fill="#8fb0c9" font-size="11.5" text-anchor="middle">350 vials</text>
-<text x="447" y="512" fill="#7fd3a3" font-size="11.5" text-anchor="middle">470 mm</text>
+<text x="447" y="512" fill="#7fd3a3" font-size="11.5" text-anchor="middle">464 mm</text>
 <line x1="406" y1="72.5" x2="488" y2="72.5" stroke="#9aa7b5" stroke-width="0.7" stroke-dasharray="3 3" opacity="0.5"/>
 </svg>
