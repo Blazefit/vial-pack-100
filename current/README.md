@@ -37,6 +37,14 @@ v6 fixes all of it at the root:
    params). New assertions: slot walls exist, caps printable, no perimeter cut below the
    floor, rotation key engaged, drains clear the tongue ring.
 
+5. **Snap-latching stacklids** — bead segments inside each lid's underside slot
+   click into a groove on the tray tongue's outer flank (0.2 mm engagement, the
+   same class as the proven vial nubs). **Every tray+lid is now a latched unit**
+   — vials stay covered even if a lifted layer tips — while the top tongue is
+   untouched, so stacking is unchanged. Seating is still interference-free
+   (boolean-verified 0 mm³); lifting a seated lid 0.5 mm hits 0.58 mm³ of solid
+   interference (the latch provably retains). Peel from a corner to open.
+
 Carried over from v5: skirtless drain-plate stacklid (prints plate-on-bed, support-free),
 engraved IDs + label recess, lighter frame (rim 2.5 / floor 1.6), retention nubs
 (~0.2 mm) so vials don't fall from a lifted tray.

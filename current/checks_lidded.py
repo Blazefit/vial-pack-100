@@ -17,6 +17,7 @@ reg_clr, tng_t = 0.3, 1.2
 top_tng_h, top_tng_in = 1.2, 1.1
 bot_tng_h, bot_tng_in = 1.0, 3.3
 slot_extra = 0.2
+snapA_eng, snapA_h, snapA_grv_d, snapA_z = 0.2, 0.5, 0.35, 0.35
 key_sz, lead_ch = 5.0, 1.5
 skirt_h, catch_step, lid_top_t = 11, 0.9, 4.0
 nub_d, nub_protrude = 1.8, 0.5
@@ -31,7 +32,7 @@ MIRROR = dict(vial_d=vial_d, vial_h=vial_h, cols=cols, rows=rows, bore_clear=bor
               v_clear=v_clear, pocket_wall_h=pocket_wall_h, pocket_chamfer=pocket_chamfer,
               relief_d=relief_d, reg_clr=reg_clr, tng_t=tng_t, top_tng_h=top_tng_h,
               top_tng_in=top_tng_in, bot_tng_h=bot_tng_h, bot_tng_in=bot_tng_in,
-              slot_extra=slot_extra, key_sz=key_sz, skirt_h=skirt_h, catch_step=catch_step,
+              slot_extra=slot_extra, snapA_eng=snapA_eng, snapA_h=snapA_h, snapA_grv_d=snapA_grv_d, snapA_z=snapA_z, key_sz=key_sz, skirt_h=skirt_h, catch_step=catch_step,
               nub_d=nub_d, nub_protrude=nub_protrude, engrave_d=engrave_d)
 drift = []
 try:
@@ -106,6 +107,14 @@ ck("[reg-A] lid cap over underside slot", lid_top_t - a_slot_d >= 1.0,
 ck("[reg-A] tongue sits on the rim with margin",
    top_tng_in + tng_t <= rim_w - 0.2,
    f"tongue spans {top_tng_in}..{top_tng_in+tng_t:.1f} from face on a {rim_w} rim")
+ck("[snap-A] bead engagement in nub class", 0.15 <= snapA_eng <= 0.25,
+   f"{snapA_eng} mm past reg_clr (vial nubs prove the class)")
+ck("[snap-A] groove leaves tongue >= 2 perimeters", tng_t - snapA_grv_d >= 0.8,
+   f"{tng_t} - {snapA_grv_d} = {tng_t-snapA_grv_d:.2f} mm")
+ck("[snap-A] bead swallowed when seated", snapA_grv_d - snapA_eng >= 0.1,
+   f"{snapA_grv_d-snapA_eng:.2f} mm radial slack in the groove")
+ck("[snap-A] retention shoulder above groove", snapA_z + snapA_h + 0.2 <= top_tng_h - 0.1,
+   f"groove top {snapA_z+snapA_h+0.2:.2f} vs tongue {top_tng_h} -> {top_tng_h-(snapA_z+snapA_h+0.2):.2f} shoulder")
 ck("[reg-A/B] slot deeper than tongue (positive stop = plate, never tongue)",
    slot_extra > 0, f"slots {slot_extra} mm deeper than their tongues")
 ck("[reg] slip clearance", 0.25<=reg_clr<=0.5, f"{reg_clr} mm/side -> drops on, lifts apart")

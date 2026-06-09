@@ -79,6 +79,19 @@ top_tng_in = 1.1;  // A: tongue inset from outer face (sits on the 2.5 mm rim).
 bot_tng_h  = 1.0;  // B: stacklid-top tongue height (tray floor slot is 1.2 deep)
 bot_tng_in = 3.3;  // B: inboard of the rim, into solid floor (clears relief holes >3 mm)
 slot_extra = 0.2;  // slot depth beyond tongue height -> positive stop is plate/rim, never the tongue
+
+// ---- [snap-A] latch each lid onto its tray (stacking unchanged) ----
+// Bead segments on the slot's outer wall click into a groove around the tray
+// tongue's outer flank: every tray+lid becomes a latched unit (vials stay
+// covered even if a lifted layer tips), while interface B stays a drop-on
+// register. Staircase lead faces the slot mouth (= insertion ramp AND the
+// print-overhang relief, since the lids print mouth-down); the retention
+// face on top stays square.
+snapA_eng   = 0.2;   // radial engagement past reg_clr (same class as the vial nubs)
+snapA_h     = 0.5;   // bead band height (z 0.40..0.90 in the slot)
+snapA_grv_d = 0.35;  // groove depth into the tongue flank (leaves 0.85 = 2 perims)
+snapA_z     = 0.35;  // groove bottom above rim top; groove is snapA_h+0.2 tall
+snapA_seg   = 24;    // bead segment length at each side-face center (x4)
 // [iter1] NOTE: an earlier attempt added a hulled `ring_flare` slot-mouth chamfer
 // here for elephant-foot relief. Its "tuck-inside" offsets left a 0.2 mm step
 // against the straight slot wall -> coincident faces -> NON-MANIFOLD mesh on all
@@ -173,6 +186,27 @@ module reg_slot(inset, h) {        // SUBTRACT from a part bottom (cuts z=0 up)
     }
 }
 
+// [snap-A] bead segments ADDED inside a lid underside slot (local z=0 = mouth).
+// Rooted 0.05 into the slot outer wall; steps overlap 0.05 in z so no internal
+// joint is tangent (no sliver shells -- same lesson as the detent rebuild).
+module snapA_beads() {
+    p = [0.17, 0.34, snapA_eng + reg_clr];   // protrusion past the slot wall face
+    intersection() {
+        union() for (s = [[0, tray_D/2, 0], [0, -tray_D/2, 0],
+                          [tray_W/2, 0, 90], [-tray_W/2, 0, 90]])
+            translate([s[0], s[1], 0]) rotate([0, 0, s[2]])
+                cube([snapA_seg, 14, 8], center=true);
+        union() {
+            translate([0,0,0.40]) linear_extrude(0.20)
+                ring(tray_W, tray_D, corner_r, top_tng_in-reg_clr-0.05, 0.05+p[0]);
+            translate([0,0,0.55]) linear_extrude(0.20)
+                ring(tray_W, tray_D, corner_r, top_tng_in-reg_clr-0.05, 0.05+p[1]);
+            translate([0,0,0.70]) linear_extrude(0.20)
+                ring(tray_W, tray_D, corner_r, top_tng_in-reg_clr-0.05, 0.05+p[2]);
+        }
+    }
+}
+
 // ---- corner key: a clean 45° FLAT across the +x/+y corner (closed wall) so
 // trays have an unambiguous orientation. Replaces the old through-notch, which
 // subtracted a 45° cube WIDER than the 3 mm rim and therefore sliced the corner
@@ -261,6 +295,11 @@ module tray() {
         }
         // [#2/#21] engraved row/column IDs + write-on label recess
         engrave_ids();
+        // [snap-A] groove around the tongue's outer flank: the lid's slot beads
+        // click in -> tray+lid latch closed. 0.35 deep leaves 0.85 mm tongue;
+        // the 0.15 mm of full flank above it is the retention shoulder.
+        translate([0,0,tray_h+snapA_z]) linear_extrude(snapA_h+0.2)
+            ring(tray_W, tray_D, corner_r, top_tng_in-0.1, 0.1+snapA_grv_d);
       }
       // [#4/#19] retention nubs at each cup mouth (after bores so they survive);
       // ~0.2 mm interference -> vial clicks in, won't drop from a lifted tray
@@ -349,6 +388,8 @@ module lid() {
             translate([0,0,lead_ch]) linear_extrude(0.01) rr(sk_in_w, sk_in_d, corner_r);
         }
     }
+    // [snap-A] tongue latch too (belt + braces with the skirt snap)
+    snapA_beads();
 }
 
 // [#drain] drain-hole cutter: a through bore + a small top lead-in chamfer at
@@ -390,6 +431,8 @@ module stacklid() {
         // [#drain] directed drainage onto the hex interstices below
         if (lid_drain) lid_drains();
     }
+    // [snap-A] click onto the tray below (the stacking tongue above is untouched)
+    snapA_beads();
 }
 
 // ---- part dispatch (read-only selector; never re-assign PART) ----
