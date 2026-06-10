@@ -1,0 +1,29 @@
+name: manifold-audit
+
+on:
+  push:
+    paths:
+      - "**.stl"
+      - "tools/check_stl_manifold.py"
+      - ".manifoldignore"
+      - ".github/workflows/manifold-audit.yml"
+  pull_request:
+    paths:
+      - "**.stl"
+      - "tools/check_stl_manifold.py"
+      - ".manifoldignore"
+      - ".github/workflows/manifold-audit.yml"
+  workflow_dispatch:
+
+jobs:
+  manifold:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+        with:
+          python-version: "3.12"
+      - name: Install mesh tooling
+        run: pip install "trimesh>=4,<5" numpy scipy
+      - name: Check every STL is watertight
+        run: python tools/check_stl_manifold.py

@@ -1,0 +1,5 @@
+# Intentional non-printables — skipped by tools/check_stl_manifold.py
+# (gitignore-style globs, one per line)
+
+# Superseded historical iteration; known 2-shell preview export, kept for the record
+iterations/4-sleeveless-tower-v3/tray.stl
